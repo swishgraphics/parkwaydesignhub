@@ -1,14 +1,14 @@
 // Token export snippets — referenced by the Colors page.
 
 export const cssTokens = `:root {
-  /* Parkway — Atomic Tangerine (primary) */
+  /* Parkway — Primary: Atomic Tangerine */
   --pk-tangerine-01: #F9956B;  --pk-tangerine-02: #FAAA89;
   --pk-tangerine-03: #FBBFA6;  --pk-tangerine-04: #FDD5C4;
   --pk-tangerine-05: #FEEAE1;  --pk-tangerine-06: #C77756;
   --pk-tangerine-07: #955940;  --pk-tangerine-08: #643C2B;
   --pk-tangerine-09: #321E15;
 
-  /* Parkway — Rich Grey (secondary) */
+  /* Parkway — Secondary: Rich Grey */
   --pk-grey-01: #121212;  --pk-grey-02: #999999;
   --pk-grey-03: #C6C6C6;  --pk-grey-04: #DDDDDD;
   --pk-grey-05: #EFEFEF;  --pk-grey-06: #FBFBFB;
@@ -17,7 +17,7 @@ export const cssTokens = `:root {
   --pk-grey-11: #171616;  --pk-grey-12: #000000;
   --pk-white-01: #FFFFFF;
 
-  /* Parkway — Buff (alternative) */
+  /* Parkway — Alternative: Buff */
   --pk-buff-01: #F2DC8E;  --pk-buff-02: #F5E3A5;
   --pk-buff-03: #F7EABB;  --pk-buff-04: #FAF1D2;
   --pk-buff-05: #FCF8E8;  --pk-buff-06: #C2B072;
@@ -114,7 +114,7 @@ export const flutterTokens = `// parkway_tokens.dart — Parkway design tokens
 import 'package:flutter/material.dart';
 
 abstract class PkColors {
-  // Atomic Tangerine (primary)
+  // Primary — Atomic Tangerine
   static const tangerine01 = Color(0xFFF9956B);
   static const tangerine02 = Color(0xFFFAAA89);
   static const tangerine03 = Color(0xFFFBBFA6);
@@ -125,7 +125,7 @@ abstract class PkColors {
   static const tangerine08 = Color(0xFF643C2B);
   static const tangerine09 = Color(0xFF321E15);
 
-  // Rich Grey (secondary)
+  // Secondary — Rich Grey
   static const grey01 = Color(0xFF121212);
   static const grey02 = Color(0xFF999999);
   static const grey03 = Color(0xFFC6C6C6);
@@ -140,7 +140,7 @@ abstract class PkColors {
   static const grey12 = Color(0xFF000000);
   static const white01 = Color(0xFFFFFFFF);
 
-  // Buff (alternative)
+  // Alternative — Buff
   static const buff01 = Color(0xFFF2DC8E);
   static const buff06 = Color(0xFFC2B072);
 

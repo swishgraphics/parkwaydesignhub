@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
 import { useTheme } from "../theme.jsx";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import { reactCheckbox, vueCheckbox, flutterCheckbox, usageCheckbox } from "../snippets/wallet.js";
 
 const ROW = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "14px 2px" };
 
-function LiveCheck({ state, onFlip }) {
-  const { theme } = useTheme();
-  const dark = theme === "dark";
+function LiveCheck({ state, dark, onFlip }) {
   const checked = state === "checked";
   const indeterminate = state === "indeterminate";
   const disabled = state === "disabled";
@@ -57,6 +55,8 @@ const PROPS_ROWS = [
 ];
 
 export default function Checkbox({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [state, setState] = useState("checked");
   const flip = () => setState((s) => (s === "checked" ? "default" : "checked"));
   const impl = { react: reactCheckbox, vue: vueCheckbox, flutter: flutterCheckbox };
@@ -67,15 +67,16 @@ export default function Checkbox({ fw, setFw }) {
 
       <SectionHeader label="Playground" desc="Click to toggle, or force a state below." />
       <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} />
         <div style={ROW}>
           <span className="ph-rowlabel">State</span>
           <Tabs small value={state} onChange={setState} label="State" items={STATES.map(([k, n]) => [k, n])} />
         </div>
       </div>
 
-      <div className="ph-stage tall" style={{ marginTop: 14 }}>
-        <LiveCheck state={state} onFlip={flip} />
-      </div>
+      <PreviewStage mode={mode} tall>
+        <LiveCheck state={state} dark={mode === "dark"} onFlip={flip} />
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock code={usageCheckbox(fw, state === "checked")} label="Usage — reflects the control above" />

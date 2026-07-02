@@ -23,7 +23,10 @@
 }
 
 /* ── Theme tokens — LIGHT (ref: hashtask) ───────────────────────────── */
-:root {
+/* Attribute selectors (not :root-only) so a nested [data-theme] scope — e.g.
+   a component preview — can re-declare these tokens independently of the app. */
+:root,
+[data-theme="light"] {
   --pk-canvas: #FFFFFF;
   --pk-rail-bg: #FBFBFA;
   --pk-panel-bg: #FFFFFF;
@@ -48,6 +51,9 @@
   --pk-shadow-md: 0 4px 6px -1px rgba(18,18,18,.08), 0 2px 4px -2px rgba(18,18,18,.08);
   --pk-shadow-lg: 0 10px 15px -3px rgba(18,18,18,.08), 0 4px 6px -4px rgba(18,18,18,.08);
   --pk-shadow-xl: 0 20px 25px -5px rgba(18,18,18,.10), 0 8px 10px -6px rgba(18,18,18,.10);
+
+  /* ReadyCash elevation tokens */
+  --rc-shadow-lg: 0 20px 25px -5px rgba(18,18,18,.10), 0 8px 10px -6px rgba(18,18,18,.10);
 
   /* interactive text field */
   --pk-accent-ring: rgba(249, 149, 107, 0.20);
@@ -106,7 +112,7 @@
 }
 
 /* ── Theme tokens — DARK (ref: Knowledge Base) ──────────────────────── */
-:root[data-theme="dark"] {
+[data-theme="dark"] {
   --pk-canvas: #1A1A1A;
   --pk-rail-bg: #0E0E0E;
   --pk-panel-bg: #161616;
@@ -377,6 +383,13 @@ a { color: inherit; }
 .ph-children { margin: 2px 0 2px 16px; padding-left: 12px; border-left: 1px solid var(--pk-line); }
 .ph-children .ph-itemlabel { font-size: 12.5px; }
 
+/* expandable group rows (Inputs parent) */
+.ph-item-group { font-family: var(--pk-sans); }
+.ph-item-group.has-active .ph-itemlabel { color: var(--pk-text); font-weight: 600; }
+.ph-chevron { font-size: 10px; color: var(--pk-text-faint); flex: none; }
+.ph-subitems { margin: 2px 0 4px 10px; padding-left: 12px; border-left: 2px solid var(--pk-accent-soft, var(--pk-line)); }
+.ph-subitem .ph-itemlabel { font-size: 12.5px; }
+
 /* status badges */
 .ph-badge { font: 600 8.5px var(--pk-sans); letter-spacing: 1px; padding: 2px 6px; border-radius: 5px; flex: none; }
 .ph-badge.live { color: var(--pk-warn-ink); background: var(--pk-warn-soft); }
@@ -527,6 +540,7 @@ a { color: inherit; }
 /* ── Buttons page ───────────────────────────────────────────────────── */
 .ph-live-primary:hover { background: #FBBFA6 !important; }
 .ph-live-alternative:hover { background: #DDDDDD !important; }
+.ph-live-secondary:hover { background: #DDDDDD !important; }
 .ph-tablewrap { overflow-x: auto; }
 .ph-table { border-collapse: collapse; width: 100%; }
 .ph-table th { text-align: left; font: 600 10.5px var(--pk-sans); letter-spacing: 1.6px; text-transform: uppercase; color: var(--pk-text-muted); padding: 0 24px 12px 0; border-bottom: 1px solid var(--pk-line); }

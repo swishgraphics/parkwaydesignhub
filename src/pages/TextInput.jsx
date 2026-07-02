@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { useTheme } from "../theme.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import { CaretDown } from "../iconography/index.js";
 import { reactTextInput, vueTextInput, flutterTextInput, usageTextInput } from "../snippets/wallet.js";
 
@@ -60,6 +61,8 @@ const PROPS_ROWS = [
 ];
 
 export default function TextInput({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [addon, setAddon] = useState("none");
   const [state, setState] = useState("default");
   const impl = { react: reactTextInput, vue: vueTextInput, flutter: flutterTextInput };
@@ -70,6 +73,7 @@ export default function TextInput({ fw, setFw }) {
 
       <SectionHeader label="Playground" desc="Adjust the controls; the preview and snippet update together." />
       <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} />
         <div style={ROW}>
           <span className="ph-rowlabel">Add-on</span>
           <Tabs small value={addon} onChange={setAddon} label="Add-on" items={[["none", "None"], ["icon", "Icon"], ["helper", "Helper"]]} />
@@ -80,9 +84,9 @@ export default function TextInput({ fw, setFw }) {
         </div>
       </div>
 
-      <div className="ph-stage tall" style={{ marginTop: 14 }}>
+      <PreviewStage mode={mode} tall>
         <LiveInput addon={addon} state={state} />
-      </div>
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock code={usageTextInput(fw, addon, state)} label="Usage — reflects the controls above" />

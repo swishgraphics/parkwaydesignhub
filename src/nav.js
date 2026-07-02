@@ -55,9 +55,9 @@ export const MODULES = [
         status: "live",
         count: 33,
         children: [
-          { label: "Atomic Tangerine", count: 9, anchor: "tangerine" },
-          { label: "Rich Grey & White", count: 13, anchor: "grey" },
-          { label: "Buff", count: 9, anchor: "buff" },
+          { label: "Primary — Atomic Tangerine", count: 9, anchor: "tangerine" },
+          { label: "Secondary — Rich Grey & White", count: 13, anchor: "grey" },
+          { label: "Alternative — Buff", count: 9, anchor: "buff" },
           { label: "Messaging", count: 2, anchor: "messaging" },
         ],
       },
@@ -83,11 +83,17 @@ export const MODULES = [
 export const DEFAULT_PAGE = "introduction";
 
 // Flat lookup for a module set: item id -> { ...item, module } (external excluded).
+// Also indexes subItems so hash-routed sub-pages resolve correctly.
 export function buildItems(modules) {
   const map = {};
   modules.forEach((m) =>
     m.items.forEach((it) => {
-      if (!it.external) map[it.id] = { ...it, module: m.label };
+      if (!it.external) {
+        map[it.id] = { ...it, module: m.label };
+        it.subItems?.forEach((sub) => {
+          if (!sub.external) map[sub.id] = { ...sub, module: m.label, parentId: it.id };
+        });
+      }
     })
   );
   return map;
@@ -102,7 +108,9 @@ export function firstItemId(modules, moduleId) {
 
 // Which rail module owns a given item id (for active rail highlight)
 export function moduleOf(modules, itemId) {
-  return modules.find((m) => m.items.some((it) => it.id === itemId))?.id;
+  return modules.find((m) =>
+    m.items.some((it) => it.id === itemId || it.subItems?.some((s) => s.id === itemId))
+  )?.id;
 }
 
 // Scaffold nav for not-yet-branded products: the same module structure and

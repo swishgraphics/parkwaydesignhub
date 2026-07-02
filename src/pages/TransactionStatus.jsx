@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { useTheme } from "../theme.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import {
   reactTransactionStatus,
   vueTransactionStatus,
@@ -80,6 +81,8 @@ const PROPS_ROWS = [
 ];
 
 export default function TransactionStatus({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [typeVal,   setTypeVal]   = useState("stamp-duty");
   const [statusVal, setStatusVal] = useState("successful");
 
@@ -98,7 +101,12 @@ export default function TransactionStatus({ fw, setFw }) {
         Inactive surfaces follow the light/dark theme.
       </Lead>
 
-      <div className="ph-stage tall" style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 24 }}>
+      <SectionHeader label="Playground" desc="Toggle the filters, or switch the preview between light and dark." />
+      <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} divider={false} />
+      </div>
+
+      <PreviewStage mode={mode} tall stageStyle={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <FilterGroup
           groupLabel="Transaction Type"
           options={TX_TYPES}
@@ -117,7 +125,7 @@ export default function TransactionStatus({ fw, setFw }) {
           bgVar="--pk-filter-stat-bg"
           textVar="--pk-filter-stat-text"
         />
-      </div>
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock

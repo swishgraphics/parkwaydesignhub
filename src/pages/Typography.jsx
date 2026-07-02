@@ -39,12 +39,19 @@ function Ramp({ rows, body }) {
   );
 }
 
-export default function Typography({ fw, setFw }) {
+export default function Typography({ fw, setFw, product }) {
   const [device, setDevice] = useState("desktop");
   const ramp = device === "desktop" ? TYPE_DESKTOP : TYPE_MOBILE;
+  const isRC = product?.id === "readycash";
+  const cssLabel = isRC ? "readycash-type.css (Vue & React)" : "parkway-type.css (Vue & React)";
+  const dartLabel = isRC ? "readycash_text_theme.dart" : "parkway_text_theme.dart";
   return (
     <>
-      <Lead>Display in PP Right Gothic Wide Medium; body in Manrope. Specimens render in the real bundled font.</Lead>
+      <Lead>
+        {isRC
+          ? "Display headings are set in PP Right Gothic Wide Medium; H5/H6 and all paragraph styles use Manrope. These specimens render in the real PP Right Gothic — bundled with the hub."
+          : "Display headings are set in PP Right Gothic Wide Medium; H5/H6 and all paragraph styles use Manrope. These specimens render in the real PP Right Gothic — bundled with the hub."}
+      </Lead>
 
       <SectionHeader label="Typeface" desc="PP Right Gothic Wide — the licensed display face, bundled with the hub. Download it to install on your system." />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap", borderTop: "1px solid var(--pk-line-soft)", padding: "16px 2px" }}>
@@ -80,7 +87,7 @@ export default function Typography({ fw, setFw }) {
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock
         code={fw === "flutter" ? typoFlutter : typoCssDesktop}
-        label={fw === "flutter" ? "parkway_text_theme.dart" : "parkway-type.css (Vue & React)"}
+        label={fw === "flutter" ? dartLabel : cssLabel}
       />
     </>
   );

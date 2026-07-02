@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { useTheme } from "../theme.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import { reactMarquee, vueMarquee, flutterMarquee, usageMarquee } from "../snippets/wallet.js";
 
 const ITEMS = [
@@ -73,6 +74,8 @@ const PROPS_ROWS = [
 ];
 
 export default function Marquee({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [speedKey, setSpeedKey] = useState("normal");
   const speed = SPEEDS.find(([k]) => k === speedKey)?.[2] ?? 40;
   const impl = { react: reactMarquee, vue: vueMarquee, flutter: flutterMarquee };
@@ -87,15 +90,16 @@ export default function Marquee({ fw, setFw }) {
 
       <SectionHeader label="Playground" desc="Adjust scroll speed; the usage snippet updates." />
       <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "14px 2px" }}>
           <span className="ph-rowlabel">Speed</span>
           <Tabs small value={speedKey} onChange={setSpeedKey} label="Speed" items={SPEEDS.map(([k, n]) => [k, n])} />
         </div>
       </div>
 
-      <div className="ph-stage tall" style={{ marginTop: 14, padding: 0, overflow: "hidden" }}>
+      <PreviewStage mode={mode} tall stageStyle={{ padding: 0, overflow: "hidden" }}>
         <LiveMarquee items={ITEMS} speed={speed} />
-      </div>
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock code={usageMarquee(fw, speed)} label="Usage — reflects the control above" />

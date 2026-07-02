@@ -3,8 +3,8 @@ import { PRODUCTS, linkTo } from "../products.js";
 import { CaretDown, Check } from "../iconography/index.js";
 
 function Mark({ product, size = 22 }) {
-  if (product.hasLogo) {
-    return <img className="ph-pmark" src="/logos/parkway-mark.svg" alt="" width={size} height={size} />;
+  if (product.hasLogo && product.logo?.mark) {
+    return <img className="ph-pmark" src={product.logo.mark} alt="" width={size} height={size} />;
   }
   return (
     <span className="ph-pletter" aria-hidden="true" style={{ width: size, height: size }}>

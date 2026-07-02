@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { useTheme } from "../theme.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import { reactToast, vueToast, flutterToast, usageToast } from "../snippets/wallet.js";
 
 const ROW = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "14px 2px" };
@@ -43,6 +44,8 @@ const PROPS_ROWS = [
 ];
 
 export default function ToastMessage({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [variant, setVariant] = useState("success");
   const impl = { react: reactToast, vue: vueToast, flutter: flutterToast };
   const label = { react: "PkToast.jsx + parkway-toast.css", vue: "PkToast.vue", flutter: "pk_toast.dart" };
@@ -52,15 +55,16 @@ export default function ToastMessage({ fw, setFw }) {
 
       <SectionHeader label="Playground" desc="Switch the variant; the preview and snippet update together." />
       <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} />
         <div style={ROW}>
           <span className="ph-rowlabel">Variant</span>
           <Tabs small value={variant} onChange={setVariant} label="Variant" items={[["success", "Success"], ["warning", "Warning"]]} />
         </div>
       </div>
 
-      <div className="ph-stage tall" style={{ marginTop: 14 }}>
+      <PreviewStage mode={mode} tall>
         <LiveToast variant={variant} />
-      </div>
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock code={usageToast(fw, variant)} label="Usage — reflects the control above" />

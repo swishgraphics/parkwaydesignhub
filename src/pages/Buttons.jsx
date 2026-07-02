@@ -1,28 +1,38 @@
 import { useState } from "react";
 import { BTN, FRAMEWORKS } from "../tokens.js";
-import { Lead, SectionHeader, Tabs, Select, CodeBlock } from "../components/primitives.jsx";
+import { useTheme } from "../theme.jsx";
+import { Lead, SectionHeader, Tabs, Select, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import { reactButton, vueButton, flutterButton, usageSnippet } from "../snippets/index.js";
 import { reactLink, vueLink, flutterLink, usageLink } from "../snippets/wallet.js";
+import { rcReactButton, rcVueButton, rcFlutterButton, rcUsageSnippet } from "../snippets/readycash-snippets.js";
+
+const RC_VARIANT_TABS = [["primary", "Primary"], ["secondary", "Secondary"]];
+const PK_VARIANT_TABS = [["primary", "Primary"], ["alternative", "Alternative"]];
 
 const ROW = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "14px 2px", borderBottom: "1px solid var(--pk-line-soft)" };
 
 // ── Filled button preview ──────────────────────────────────────────────
-function LiveButton({ variant, size, state, platform }) {
-  const pal = BTN[variant];
+function LiveButton({ variant, size, state, platform, btn, fontFamily }) {
+  const pal = btn[variant];
   const disabled = state === "disabled";
   const label = size === "small" ? "Sign in" : "Get a demo";
-  const w = BTN.widths[size];
-  const radius = platform === "mobile" ? BTN.radiusMobile : BTN.radius;
+  const w = btn.widths[size];
+  const textColor = disabled ? btn.textDisabled : (pal?.textColor || btn.text);
+  // Parkway: desktop=pill(radius), mobile=rect(radiusMobile)
+  // RC: desktop=rounded(radiusRounded), mobile=rect(radius)
+  const radius = btn.radiusMobile
+    ? (platform === "mobile" ? btn.radiusMobile : btn.radius)
+    : (platform === "desktop" ? (btn.radiusRounded ?? btn.radius) : btn.radius);
   return (
     <button
       type="button"
       disabled={disabled}
       className={state === "default" ? `ph-live-${variant}` : ""}
       style={{
-        height: BTN.height, borderRadius: radius, border: 0,
+        height: btn.height, borderRadius: radius, border: 0,
         width: w === "100%" ? "100%" : w, maxWidth: "100%",
-        background: pal[state], color: disabled ? BTN.textDisabled : BTN.text,
-        font: BTN.font, fontFamily: "Manrope, sans-serif",
+        background: pal[state], color: textColor,
+        font: btn.font, fontFamily,
         display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
         cursor: disabled ? "not-allowed" : "pointer", transition: "background .15s ease",
       }}
@@ -57,11 +67,19 @@ function LiveLink({ icon, state }) {
   );
 }
 
-const PROPS_ROWS = [
+const PK_PROPS_ROWS = [
   ["variant", '"primary" | "alternative"', '"primary"', "Tangerine for the page's main action; grey Alternative elsewhere."],
   ["size", '"small" | "icon" | "medium" | "large" | "xlarge"', '"medium"', "Fixed widths 98 / 200 / 275 / 325px; xlarge fills its container. All 54px tall."],
   ["platform", '"desktop" | "mobile"', '"desktop"', "Desktop is the 27px pill; mobile is an 8px radius."],
   ["disabled", "boolean", "false", "Tangerine-04 / Grey-06 fill with Grey-07 text."],
+];
+
+const RC_PROPS_ROWS = [
+  ["variant", '"primary" | "secondary"', '"primary"', "Tangerine for the main action; grey Secondary for supporting actions."],
+  ["size", '"small" | "medium" | "large" | "xlarge"', '"medium"', "Fixed widths 168 / 187 / 195px; xlarge fills its container. All are 56px tall."],
+  ["rounded", "boolean", "false", "false → 4px rectangular (default); true → 28px pill shape."],
+  ["disabled", "boolean", "false", "Tangerine-04 / Grey-06 fill with Grey-07 text. Flutter: pass onPressed: null."],
+  ["children / label", "string", "—", '"Sign in" pattern for small; sentence-case verbs ("Get a demo") for the rest.'],
 ];
 
 const LINK_PROPS_ROWS = [
@@ -78,7 +96,13 @@ const LINK_STATES = [
   ["disabled", "Disabled", "Tangerine-04, non-interactive."],
 ];
 
-export default function Buttons({ fw, setFw }) {
+export default function Buttons({ fw, setFw, product }) {
+  const t = product?.tokens;
+  const btn = t?.btn || BTN;
+  const isRC = !!t;
+  const variantTabs = isRC ? RC_VARIANT_TABS : PK_VARIANT_TABS;
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [btnStyle, setBtnStyle] = useState("filled");
   // filled controls
   const [variant, setVariant] = useState("primary");
@@ -90,21 +114,36 @@ export default function Buttons({ fw, setFw }) {
   const [linkState, setLinkState] = useState("default");
 
   const isLink = btnStyle === "link";
-  const filledImpl = { vue: vueButton, react: reactButton, flutter: flutterButton };
-  const filledLabel = { vue: "PkButton.vue", react: "PkButton.jsx + parkway-button.css", flutter: "pk_button.dart" };
+  const fontFamily = "Manrope, sans-serif";
+  const sizeOptions = isRC ? ["small", "medium", "large", "xlarge"] : ["small", "icon", "medium", "large", "xlarge"];
+
+  const filledImpl  = isRC
+    ? { vue: rcVueButton,  react: rcReactButton,  flutter: rcFlutterButton }
+    : { vue: vueButton,    react: reactButton,     flutter: flutterButton };
+  const filledLabel = isRC
+    ? { vue: "RcButton.vue", react: "RcButton.jsx + readycash-button.css", flutter: "rc_button.dart" }
+    : { vue: "PkButton.vue", react: "PkButton.jsx + parkway-button.css",   flutter: "pk_button.dart" };
   const linkImpl = { vue: vueLink, react: reactLink, flutter: flutterLink };
   const linkLabel = { vue: "PkLink.vue", react: "PkLink.jsx + parkway-link.css", flutter: "pk_link.dart" };
-  const pal = BTN[variant];
+
+  const lead = t?.buttonsLead || "Pill-shaped, 54px tall, set in Manrope SemiBold 14. Two variants (Primary tangerine, Alternative grey) across five sizes and three states. Hover the preview for the real state.";
+
+  const pal = btn[variant] || btn.primary;
 
   return (
     <>
       <Lead>
-        Buttons commit actions. Two styles: <strong>filled</strong> for primary/secondary actions,
-        and <strong>link</strong> for inline, low-emphasis ones.
+        {isRC ? lead : (
+          <>
+            Buttons commit actions. Two styles: <strong>filled</strong> for primary/secondary actions,
+            and <strong>link</strong> for inline, low-emphasis ones.
+          </>
+        )}
       </Lead>
 
       <SectionHeader label="Playground" desc="Pick a style, then tune it; the preview and snippet update together." />
       <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} />
         <div style={ROW}>
           <span className="ph-rowlabel">Style</span>
           <Tabs small value={btnStyle} onChange={setBtnStyle} label="Style" items={[["filled", "Filled"], ["link", "Link"]]} />
@@ -125,11 +164,11 @@ export default function Buttons({ fw, setFw }) {
           <>
             <div style={ROW}>
               <span className="ph-rowlabel">Variant</span>
-              <Tabs small value={variant} onChange={setVariant} label="Variant" items={[["primary", "Primary"], ["alternative", "Alternative"]]} />
+              <Tabs small value={variant} onChange={setVariant} label="Variant" items={variantTabs} />
             </div>
             <div style={ROW}>
               <span className="ph-rowlabel">Size</span>
-              <Select value={size} onChange={setSize} label="Size" options={["small", "icon", "medium", "large", "xlarge"]} />
+              <Select value={size} onChange={setSize} label="Size" options={sizeOptions} />
             </div>
             <div style={ROW}>
               <span className="ph-rowlabel">State</span>
@@ -137,15 +176,17 @@ export default function Buttons({ fw, setFw }) {
             </div>
             <div style={{ ...ROW, borderBottom: 0 }}>
               <span className="ph-rowlabel">Platform</span>
-              <Tabs small value={platform} onChange={setPlatform} label="Platform" items={[["desktop", "Desktop"], ["mobile", "Mobile"]]} />
+              <Tabs small value={platform} onChange={setPlatform} label="Platform" items={[["mobile", "Mobile"], ["desktop", "Desktop"]]} />
             </div>
           </>
         )}
       </div>
 
-      <div className="ph-stage tall" style={{ marginTop: 14 }}>
-        {isLink ? <LiveLink icon={linkIcon} state={linkState} /> : <LiveButton variant={variant} size={size} state={state} platform={platform} />}
-      </div>
+      <PreviewStage mode={mode} tall>
+        {isLink
+          ? <LiveLink icon={linkIcon} state={linkState} />
+          : <LiveButton variant={variant} size={size} state={state} platform={platform} btn={btn} fontFamily={fontFamily} />}
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       {isLink ? (
@@ -155,7 +196,7 @@ export default function Buttons({ fw, setFw }) {
         </>
       ) : (
         <>
-          <CodeBlock code={usageSnippet(fw, variant, size, state, platform)} label="Usage — reflects the controls above" />
+          <CodeBlock code={isRC ? rcUsageSnippet(fw, variant, size, state, platform === "desktop") : usageSnippet(fw, variant, size, state, platform)} label="Usage — reflects the controls above" />
           <CodeBlock code={filledImpl[fw]} label={filledLabel[fw]} />
         </>
       )}
@@ -165,7 +206,7 @@ export default function Buttons({ fw, setFw }) {
         <table className="ph-table">
           <thead><tr>{["Prop", "Type", "Default", "Notes"].map((h) => <th key={h}>{h}</th>)}</tr></thead>
           <tbody>
-            {(isLink ? LINK_PROPS_ROWS : PROPS_ROWS).map(([p, t, d, n]) => (
+            {(isLink ? LINK_PROPS_ROWS : isRC ? RC_PROPS_ROWS : PK_PROPS_ROWS).map(([p, t, d, n]) => (
               <tr key={p}>
                 <td className="ph-td-prop">{p}</td>
                 <td className="ph-td-type">{t}</td>
@@ -216,6 +257,12 @@ export default function Buttons({ fw, setFw }) {
                 <li>Keep the label a concise verb phrase.</li>
                 <li>Underline on hover so it reads as interactive.</li>
               </>
+            ) : isRC ? (
+              <>
+                <li>Use one Primary button per view; pair it with Secondary for supporting actions.</li>
+                <li>Keep labels to 1–3 words in sentence case.</li>
+                <li>Use xlarge full-width on mobile checkout-style flows.</li>
+              </>
             ) : (
               <>
                 <li>One Primary button per view; pair it with Alternative for secondary actions.</li>
@@ -233,6 +280,12 @@ export default function Buttons({ fw, setFw }) {
                 <li>Don't use a link for the primary commit action — use a filled button.</li>
                 <li>Don't stack several link buttons where one filled button is clearer.</li>
                 <li>Don't rely on colour alone; keep the underline affordance on hover.</li>
+              </>
+            ) : isRC ? (
+              <>
+                <li>Don't mix Rectangular and Rounded themes within the same surface.</li>
+                <li>Don't recolor states manually — the tokens already encode hover/disabled.</li>
+                <li>Don't rely on color alone for disabled; keep the control non-interactive.</li>
               </>
             ) : (
               <>

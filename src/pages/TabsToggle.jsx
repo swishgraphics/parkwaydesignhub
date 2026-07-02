@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { useTheme } from "../theme.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import {
   reactTabsToggle,
   vueTabsToggle,
@@ -77,6 +78,8 @@ const PROPS_ROWS = [
 ];
 
 export default function TabsToggle({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [active, setActive] = useState("pay-now");
 
   const impl = { react: reactTabsToggle, vue: vueTabsToggle, flutter: flutterTabsToggle };
@@ -93,9 +96,14 @@ export default function TabsToggle({ fw, setFw }) {
         its colours follow the light/dark theme.
       </Lead>
 
-      <div className="ph-stage tall" style={{ marginTop: 14 }}>
-        <LiveTabsToggle value={active} onChange={setActive} />
+      <SectionHeader label="Playground" desc="Switch tabs, or switch the preview between light and dark." />
+      <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} divider={false} />
       </div>
+
+      <PreviewStage mode={mode} tall>
+        <LiveTabsToggle value={active} onChange={setActive} />
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock code={usageTabsToggle(fw, active)} label="Usage — reflects active tab above" />

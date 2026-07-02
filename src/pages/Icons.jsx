@@ -25,7 +25,7 @@ const INSTALL = {
   flutter: `# Flutter\nflutter pub add phosphor_flutter`,
 };
 
-const USAGE = {
+const PK_USAGE = {
   react: `import { Cube } from "@phosphor-icons/react";
 
 export default function Badge() {
@@ -47,14 +47,38 @@ PhosphorIcon(
 )`,
 };
 
-export default function Icons({ fw, setFw }) {
+const RC_USAGE = {
+  react: `import { Cube } from "@phosphor-icons/react";
+
+export default function Badge() {
+  return <Cube size={24} weight="bold" color="#FF4972" />;
+}`,
+  vue: `<script setup>
+import { PhCube } from "@phosphor-icons/vue";
+</script>
+
+<template>
+  <PhCube :size="24" weight="bold" color="#FF4972" />
+</template>`,
+  flutter: `import 'package:phosphor_flutter/phosphor_flutter.dart';
+
+PhosphorIcon(
+  PhosphorIcons.cube(PhosphorIconsStyle.bold),
+  size: 24,
+  color: RcColors.primary80,
+)`,
+};
+
+export default function Icons({ fw, setFw, product }) {
   const [weight, setWeight] = useState("regular");
+  const isRC = product?.id === "readycash";
+  const USAGE = isRC ? RC_USAGE : PK_USAGE;
+  const brand = isRC ? "ReadyCash" : "Parkway";
   return (
     <>
       <Lead>
-        <strong>Phosphor</strong> is Parkway's icon set. This page previews a curated, finance-first
-        selection — <strong>not</strong> the full library. To use any icon, install Phosphor for your
-        framework (below) and import what you need.
+        {brand} uses <strong>Phosphor</strong> as its icon set — a flexible family with multiple
+        weights. Browse a curated selection, copy any import, or install Phosphor for your framework.
       </Lead>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, flexWrap: "wrap" }}>

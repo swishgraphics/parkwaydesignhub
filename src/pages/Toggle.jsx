@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { FRAMEWORKS } from "../tokens.js";
 import { useTheme } from "../theme.jsx";
-import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
+import { Lead, SectionHeader, Tabs, CodeBlock, PreviewStage, ModeRow } from "../components/primitives.jsx";
 import { reactToggle, vueToggle, flutterToggle, usageToggle } from "../snippets/wallet.js";
 
 const ROW = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "14px 2px" };
 
-function LiveToggle({ state, platform, onFlip }) {
-  const { theme } = useTheme();
-  const dark = theme === "dark";
+function LiveToggle({ state, platform, dark, onFlip }) {
   const on = state === "on";
   const disabled = state === "disabled";
   const offTrack = dark ? "#3A3A38" : "#DDDDDD";
@@ -49,6 +47,8 @@ const PROPS_ROWS = [
 ];
 
 export default function Toggle({ fw, setFw }) {
+  const app = useTheme();
+  const [mode, setMode] = useState(app.theme);
   const [state, setState] = useState("on");
   const [platform, setPlatform] = useState("desktop");
   const flip = () => setState((s) => (s === "on" ? "off" : "on"));
@@ -60,6 +60,7 @@ export default function Toggle({ fw, setFw }) {
 
       <SectionHeader label="Playground" desc="Toggle it directly, or force a state below." />
       <div style={{ border: "1px solid var(--pk-line)", borderRadius: 12, padding: "2px 18px", marginTop: 6 }}>
+        <ModeRow mode={mode} setMode={setMode} />
         <div style={{ ...ROW, borderBottom: "1px solid var(--pk-line-soft)" }}>
           <span className="ph-rowlabel">State</span>
           <Tabs small value={state} onChange={setState} label="State" items={STATES.map(([k, n]) => [k, n])} />
@@ -70,9 +71,9 @@ export default function Toggle({ fw, setFw }) {
         </div>
       </div>
 
-      <div className="ph-stage tall" style={{ marginTop: 14 }}>
-        <LiveToggle state={state} platform={platform} onFlip={flip} />
-      </div>
+      <PreviewStage mode={mode} tall>
+        <LiveToggle state={state} platform={platform} dark={mode === "dark"} onFlip={flip} />
+      </PreviewStage>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
       <CodeBlock code={usageToggle(fw, state, platform)} label="Usage — reflects the control above" />

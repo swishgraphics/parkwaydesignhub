@@ -32,6 +32,39 @@ function ItemRow({ it, active, productId }) {
   );
 }
 
+function GroupRow({ it, activePage, productId }) {
+  const hasActiveSub = it.subItems?.some((s) => s.id === activePage);
+  const [open, setOpen] = useState(hasActiveSub);
+  return (
+    <div>
+      <button
+        type="button"
+        className={`ph-item ph-item-group${hasActiveSub ? " has-active" : ""}`}
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open || hasActiveSub}
+      >
+        <span className="ph-itemlabel">{it.label}<Badge status={it.status} /></span>
+        <span className="ph-chevron" aria-hidden="true">{open || hasActiveSub ? "▾" : "▸"}</span>
+      </button>
+      {(open || hasActiveSub) && (
+        <div className="ph-subitems">
+          {it.subItems.map((sub) => (
+            <a
+              key={sub.id}
+              className={`ph-item ph-subitem${activePage === sub.id ? " act" : ""}${sub.status === "soon" ? " soon" : ""}`}
+              href={linkTo(productId, sub.id)}
+              aria-current={activePage === sub.id ? "page" : undefined}
+            >
+              <span className="ph-itemlabel">{sub.label}<Badge status={sub.status} /></span>
+              {sub.meta != null && <span className="ph-itemcount">{sub.meta}</span>}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Search({ q, setQ }) {
   return (
     <div className="ph-dirsearch">
@@ -113,29 +146,33 @@ export default function Directory({ product, activePage }) {
       <div className="ph-dirscroll">
         <Search q={q} setQ={setQ} />
         <p className="ph-group">{activeModule.label}</p>
-        {activeModule.items.map((it) => (
-          <div key={it.id}>
-            <ItemRow it={it} active={activePage === it.id} productId={pid} />
-            {it.children && activePage === it.id && (
-              <div className="ph-children">
-                {it.children.map((c, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    className="ph-item ph-item--child"
-                    onClick={() => {
-                      const el = c.anchor && document.getElementById(`pk-color-${c.anchor}`);
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }}
-                  >
-                    <span className="ph-itemlabel">{c.label}</span>
-                    {c.count != null && <span className="ph-itemcount">{c.count}</span>}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+        {activeModule.items.map((it) =>
+          it.subItems ? (
+            <GroupRow key={it.id} it={it} activePage={activePage} productId={pid} />
+          ) : (
+            <div key={it.id}>
+              <ItemRow it={it} active={activePage === it.id} productId={pid} />
+              {it.children && activePage === it.id && (
+                <div className="ph-children">
+                  {it.children.map((c, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className="ph-item ph-item--child"
+                      onClick={() => {
+                        const el = c.anchor && document.getElementById(`pk-color-${c.anchor}`);
+                        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                    >
+                      <span className="ph-itemlabel">{c.label}</span>
+                      {c.count != null && <span className="ph-itemcount">{c.count}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        )}
       </div>
       <Foot />
     </aside>

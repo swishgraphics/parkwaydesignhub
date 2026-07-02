@@ -4,16 +4,71 @@ import { copyText } from "../lib/copy.js";
 import { Lead, SectionHeader, Tabs } from "../components/primitives.jsx";
 import { DownloadSimple } from "../iconography/index.js";
 
-const LOCKUPS = [
-  { id: "light", name: "On light", file: "/logos/logo-light.svg", base: "parkway-logo-light", stage: "light", meta: "logo-light.svg · 582×104", alt: "Parkway wordmark for light backgrounds" },
-  { id: "dark", name: "On dark", file: "/logos/logo-dark.svg", base: "parkway-logo-dark", stage: "dark", meta: "logo-dark.svg · 582×104", alt: "Parkway wordmark for dark backgrounds" },
+// ─── Parkway lockups ────────────────────────────────────────────────────────
+const PK_LOCKUPS = [
+  { id: "light", name: "On light",  file: "/logos/logo-light.svg", base: "parkway-logo-light", stage: "light", meta: "logo-light.svg · 582×104", alt: "Parkway wordmark for light backgrounds" },
+  { id: "dark",  name: "On dark",   file: "/logos/logo-dark.svg",  base: "parkway-logo-dark",  stage: "dark",  meta: "logo-dark.svg · 582×104",  alt: "Parkway wordmark for dark backgrounds" },
 ];
 
-function LogoCard({ item, scale }) {
+// ─── ReadyCash — Parkway mark paths (from Figma, viewBox 0 0 68.9891 12.3327)
+// Two fill colours: #292B33 (light) or #FFFFFF (dark) for the "parkway" letters;
+// the arrow always stays Atomic Tangerine (#F9956B).
+const RC_MARK_PATHS = [
+  "M7.98366 6.00199V6.16717C7.98366 8.58981 6.88246 9.85619 4.79019 9.85619C3.35864 9.85619 2.31251 9.14041 1.92709 7.65379L1.76191 7.70885C1.92709 8.75499 2.03721 9.41571 2.03721 10.1866V12.1687H0V2.42309H2.03721C2.03721 2.86357 1.92709 3.52429 1.76191 4.46031L1.92709 4.51537C2.31251 2.97369 3.35864 2.31297 4.79019 2.31297C6.88246 2.31297 7.98366 3.57935 7.98366 6.00199ZM2.03721 5.83681V6.33235C2.03721 7.98415 2.75298 8.97523 4.01936 8.97523C5.28573 8.97523 5.94645 8.14933 5.94645 6.38741V5.72669C5.94645 3.96477 5.28573 3.13887 4.01936 3.13887C2.75298 3.19393 2.03721 4.18501 2.03721 5.83681Z",
+  "M8.8105 8.09201C8.8105 6.66045 10.0218 6.10985 12.059 5.77949L14.0962 5.39407V4.34793C14.0962 3.24673 13.6558 2.80625 12.6647 2.80625C11.5084 2.80625 11.068 3.46697 11.068 5.17383L8.97568 4.95359C8.92062 3.19167 10.1319 2.25565 12.6096 2.25565C14.9772 2.25565 16.0784 3.02649 16.0784 4.67829V8.42237C16.0784 8.91791 16.2986 8.97297 16.8492 8.80779L16.7942 9.35839C16.5189 9.74381 16.1334 9.90899 15.6379 9.90899C14.4266 9.90899 14.0962 9.30333 14.3165 7.92683L14.1513 7.87177C13.7108 9.13815 12.5546 9.90899 11.0129 9.90899C9.58134 9.90899 8.8105 9.24827 8.8105 8.09201ZM14.0412 6.71551V5.94467L12.7748 6.21997C11.5084 6.49527 10.8477 6.88069 10.8477 7.81671V7.87177C10.8477 8.53249 11.2331 8.91791 12.004 8.91791C13.1052 8.91791 14.0412 8.03695 14.0412 6.71551Z",
+  "M17.7299 9.74728V2.4243H19.7671C19.7671 3.02996 19.7121 3.58056 19.4918 4.95706L19.657 5.01212C20.2076 2.9749 20.9234 2.36924 22.6853 2.20406L22.9055 3.91092C20.3177 4.0761 19.7671 4.57164 19.7671 6.60886V9.74728H17.7299Z",
+  "M23.7889 9.74562V0H25.8261V3.52384C25.8261 4.45986 25.7711 5.01046 25.661 5.83636L25.7711 5.89142L29.6803 2.42264H30.7815L28.4139 4.62504L30.8916 9.74562H28.6342L26.8172 5.83636L25.8261 6.71732V9.69056H23.7889V9.74562Z",
+  "M33.2015 9.74487L30.8339 2.42189H32.8711L34.0274 6.27609C34.2476 7.04693 34.4128 7.70765 34.578 8.47849H34.7431C34.9083 7.70765 35.0735 7.04693 35.2387 6.33115L36.2848 2.47695H37.9917L39.0929 6.33115C39.3131 7.04693 39.4783 7.70765 39.6435 8.53355H39.8086C39.9738 7.76271 40.194 7.10199 40.4143 6.33115L41.6256 2.47695H42.5066L40.194 9.74487H38.267L37.1658 6.16597C37.0006 5.61537 36.8354 4.95465 36.6702 4.07369H36.505C36.3399 4.89959 36.1747 5.61537 36.0095 6.16597L35.0184 9.79993H33.2015V9.74487Z",
+  "M42.78 8.09201C42.78 6.66045 43.9913 6.10985 46.0285 5.77949L48.0657 5.39407V4.34793C48.0657 3.24673 47.6252 2.80625 46.6341 2.80625C45.4779 2.80625 45.0374 3.46697 45.0374 5.17383L42.9451 4.95359C42.8901 3.19167 44.1014 2.25565 46.5791 2.25565C48.9466 2.25565 50.0478 3.02649 50.0478 4.67829V8.42237C50.0478 8.91791 50.2681 8.97297 50.8187 8.80779L50.7636 9.35839C50.4883 9.74381 50.1029 9.90899 49.6074 9.90899C48.396 9.90899 48.0657 9.30333 48.2859 7.92683L48.1207 7.87177C47.6803 9.19321 46.524 9.90899 45.0374 9.90899C43.6059 9.90899 42.78 9.24827 42.78 8.09201ZM48.0657 6.71551V5.94467L46.7993 6.21997C45.5329 6.49527 44.8722 6.88069 44.8722 7.81671V7.87177C44.8722 8.53249 45.2576 8.91791 46.0285 8.91791C47.1297 8.91791 48.0657 8.03695 48.0657 6.71551Z",
+  "M50.9326 10.6258L52.254 10.5708C53.5755 10.5157 53.7957 10.4056 53.9609 10.0752L54.1261 9.74487L50.5472 2.42189H52.8046L54.4014 6.00079C54.6216 6.55139 54.8418 7.04693 55.0621 7.70765H55.2273C55.4475 7.04693 55.6127 6.55139 55.8329 6.00079L57.2094 2.42189H58.1454L55.2273 9.35945C54.2362 11.672 53.5755 12.1675 51.0978 12.3327L50.9326 10.6258Z",
+];
+// Arrow mark (always Tangerine)
+const RC_MARK_ARROW = "M60.8953 9.74266H68.6037C68.8239 9.74266 68.9891 9.57748 68.9891 9.35724V7.04472C65.7956 7.04472 63.2078 4.4569 63.2078 1.26342H60.8953C60.6751 1.26342 60.5099 1.4286 60.5099 1.64884V9.35724C60.5099 9.52242 60.6751 9.74266 60.8953 9.74266ZM66.6766 8.14592H62.0515V3.57594C62.7673 5.72328 64.4742 7.43014 66.6766 8.14592Z";
+
+// Inline SVG — rendered in the DOM so the page's PP Right Gothic font applies.
+// Layout mirrors the Figma node 29591:349421 exactly:
+//   • "readycash" 32px PP Right Gothic Wide Bold, #292B33 / #FFF
+//   • "by parkway" right-aligned below at y=33, gap 2.4px between "by" and the mark
+//   • Parkway mark at native viewBox coords (68.9891×12.3327), placed via translate
+function RcLogoMark({ textColor, byColor }) {
+  const markColor = textColor === "#FFFFFF" ? "#FFFFFF" : "#292B33";
+  return (
+    <svg viewBox="0 0 170 46" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: "100%", maxWidth: 340, height: "auto", display: "block" }}>
+      {/* readycash — 32px, tracking -0.2626px */}
+      <text x="0" y="32"
+        fontFamily="'PP Right Gothic Wide', 'PP Right Gothic', sans-serif"
+        fontWeight="700" fontSize="32" letterSpacing="-0.2626"
+        fill={textColor}>readycash</text>
+      {/* "by" — 10px Helvetica Neue, right-aligned (x=87.611 from Figma) */}
+      <text x="87.611" y="43.5"
+        fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        fontWeight="400" fontSize="10" letterSpacing="-0.2626"
+        fill={byColor}>by</text>
+      {/* Parkway mark — translate(101.011, 33): 87.611 + ~11 ("by" width) + 2.4 (gap) */}
+      <g transform="translate(101.011, 33)">
+        {RC_MARK_PATHS.map((d, i) => <path key={i} d={d} fill={markColor} />)}
+        <path d={RC_MARK_ARROW} fill="#F9956B" />
+      </g>
+    </svg>
+  );
+}
+
+const RC_LOCKUPS = [
+  { id: "light", name: "On light", file: "/logos/rc-logo-light.svg", base: "readycash-logo-light", stage: "light", meta: "rc-logo-light.svg · 170×46", alt: "ReadyCash wordmark for light backgrounds",
+    inline: <RcLogoMark textColor="#292B33" byColor="#9ea2b3" /> },
+  { id: "dark",  name: "On dark",  file: "/logos/rc-logo-dark.svg",  base: "readycash-logo-dark",  stage: "dark",  meta: "rc-logo-dark.svg · 170×46",  alt: "ReadyCash wordmark for dark backgrounds",
+    inline: <RcLogoMark textColor="#FFFFFF" byColor="rgba(255,255,255,0.55)" /> },
+];
+
+// ─── Components ─────────────────────────────────────────────────────────────
+function LogoCard({ item, scale, useInline }) {
   return (
     <div className="ph-logocard">
       <div className={`ph-logostage ${item.stage}`}>
-        <img src={item.file} alt={item.alt} />
+        {useInline && item.inline
+          ? <div style={{ width: "100%", maxWidth: 340, padding: "0 16px" }}>{item.inline}</div>
+          : <img src={item.file} alt={item.alt} />}
       </div>
       <div className="ph-logofoot">
         <div>
@@ -33,13 +88,22 @@ function LogoCard({ item, scale }) {
   );
 }
 
-export default function Logo() {
+// ─── Page ────────────────────────────────────────────────────────────────────
+export default function Logo({ product }) {
   const [scale, setScale] = useState("2");
-  const [ok, setOk] = useState(false);
+  const [ok, setOk]       = useState(false);
+
+  const isRC      = product?.id === "readycash";
+  const lockups   = isRC ? RC_LOCKUPS : PK_LOCKUPS;
+  const brandName = isRC ? "ReadyCash" : "Parkway";
+  const accentHex = "#F9956B";
+
   return (
     <>
       <Lead>
-        The Parkway wordmark and symbol. Light on light, dark on dark — SVG for production, PNG for quick use.
+        {isRC
+          ? "The ReadyCash wordmark — \"readycash by parkway\" — straight from the Figma brand library (node 29591:349421). Use the light version on light backgrounds and the dark version on dark. SVG for production, PNG for quick use."
+          : "The Parkway wordmark and symbol, straight from the brand library. Use the light version on light backgrounds and the dark version on dark — SVG for production, PNG for quick use."}
       </Lead>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
@@ -48,30 +112,40 @@ export default function Logo() {
         <span style={{ font: "500 11px var(--pk-mono)", color: "var(--pk-text-faint)" }}>applies to PNG downloads</span>
       </div>
 
-      <SectionHeader label="Wordmark" desc="The full Parkway lockup. Keep clear space around it; don't recolor or stretch it." />
+      <SectionHeader
+        label="Wordmark"
+        desc={isRC
+          ? "\"readycash\" set in PP Right Gothic Wide Bold with the Parkway mark right-aligned below. Don't recolour, stretch, or separate the elements."
+          : "The full Parkway lockup. Keep clear space around it; don't recolor or stretch it."}
+      />
       <div className="ph-logogrid">
-        {LOCKUPS.map((it) => (
-          <LogoCard key={it.id} item={it} scale={scale} />
+        {lockups.map((it) => (
+          <LogoCard key={it.id} item={it} scale={scale} useInline={isRC} />
         ))}
       </div>
 
-      <SectionHeader label="Symbol" desc="The mark on its own — for app icons, avatars, and tight spaces." />
-      <div className="ph-logogrid">
-        <LogoCard
-          item={{ id: "mark", name: "Symbol", file: "/logos/parkway-mark.svg", base: "parkway-mark", stage: "neutral", meta: "parkway-mark.svg · 72×72", alt: "Parkway symbol" }}
-          scale={scale}
-        />
-      </div>
+      {!isRC && (
+        <>
+          <SectionHeader label="Symbol" desc="The mark on its own — for app icons, avatars, and tight spaces." />
+          <div className="ph-logogrid">
+            <LogoCard
+              item={{ id: "mark", name: "Symbol", file: "/logos/parkway-mark.svg", base: "parkway-mark", stage: "neutral", meta: "parkway-mark.svg · 72×72", alt: "Parkway symbol" }}
+              scale={scale}
+              useInline={false}
+            />
+          </div>
+        </>
+      )}
 
-      <SectionHeader label="Brand color" desc="The single accent used across the system." />
+      <SectionHeader label="Brand color" desc={`The single accent used across the ${brandName} system.`} />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--pk-line-soft)", padding: "14px 2px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 26, height: 26, borderRadius: 7, background: "#F9956B", display: "inline-block" }} aria-hidden="true" />
+          <span style={{ width: 26, height: 26, borderRadius: 7, background: accentHex, display: "inline-block" }} aria-hidden="true" />
           <span className="ph-rowlabel">Atomic Tangerine</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ font: "500 12px var(--pk-mono)", color: "var(--pk-text-muted)" }}>#F9956B</span>
-          <button type="button" className="ph-copy" onClick={() => copyText("#F9956B", setOk)} aria-live="polite">
+          <span style={{ font: "500 12px var(--pk-mono)", color: "var(--pk-text-muted)" }}>{accentHex}</span>
+          <button type="button" className="ph-copy" onClick={() => copyText(accentHex, setOk)} aria-live="polite">
             {ok ? "Copied" : "Copy"}
           </button>
         </div>
