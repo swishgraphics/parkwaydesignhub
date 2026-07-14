@@ -106,7 +106,7 @@ export default function Icons({ fw, setFw, product }) {
         value={set}
         onChange={setSet}
         label="Icon set"
-        items={[["phosphor", "Phosphor"], ["custom", "Transaction Categories"]]}
+        items={[["phosphor", "Phosphor"], ["custom", "Custom-made Icons"]]}
       />
 
       {set === "phosphor" ? (
@@ -136,7 +136,7 @@ export default function Icons({ fw, setFw, product }) {
             and install the package below — the hub only previews a representative subset.
           </p>
 
-          <SectionHeader label="Install & use" desc="Phosphor ships first-party packages for web (React), Vue, and Flutter. This applies to the Phosphor set only — the custom Transaction Categories need no package." />
+          <SectionHeader label="Install & use" desc="Phosphor ships first-party packages for web (React), Vue, and Flutter. This applies to the Phosphor set only — the custom-made icons need no package." />
           <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
           <CodeBlock code={INSTALL[fw]} label={fw === "flutter" ? "terminal" : "terminal"} />
           <CodeBlock
