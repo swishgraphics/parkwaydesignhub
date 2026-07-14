@@ -142,7 +142,14 @@ abstract class PkColors {
 
   // Alternative — Buff
   static const buff01 = Color(0xFFF2DC8E);
+  static const buff02 = Color(0xFFF5E3A5);
+  static const buff03 = Color(0xFFF7EABB);
+  static const buff04 = Color(0xFFFAF1D2);
+  static const buff05 = Color(0xFFFCF8E8);
   static const buff06 = Color(0xFFC2B072);
+  static const buff07 = Color(0xFF918455);
+  static const buff08 = Color(0xFF615839);
+  static const buff09 = Color(0xFF302C1C);
 
   // Messaging
   static const success = Color(0xFF36CC4F);

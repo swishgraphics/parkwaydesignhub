@@ -42,15 +42,16 @@ function Ramp({ rows, body }) {
 export default function Typography({ fw, setFw, product }) {
   const [device, setDevice] = useState("desktop");
   const ramp = device === "desktop" ? TYPE_DESKTOP : TYPE_MOBILE;
-  const isRC = product?.id === "readycash";
-  const cssLabel = isRC ? "readycash-type.css (Vue & React)" : "parkway-type.css (Vue & React)";
-  const dartLabel = isRC ? "readycash_text_theme.dart" : "parkway_text_theme.dart";
+  // Both products share the Parkway type ramp today — keep the Parkway file
+  // names so the copied code matches its label (RC-specific exports don't
+  // exist yet).
+  const cssLabel = "parkway-type.css (Vue & React)";
+  const dartLabel = "parkway_text_theme.dart";
   return (
     <>
       <Lead>
-        {isRC
-          ? "Display headings are set in PP Right Gothic Wide Medium; H5/H6 and all paragraph styles use Manrope. These specimens render in the real PP Right Gothic — bundled with the hub."
-          : "Display headings are set in PP Right Gothic Wide Medium; H5/H6 and all paragraph styles use Manrope. These specimens render in the real PP Right Gothic — bundled with the hub."}
+        Display headings are set in PP Right Gothic Wide Medium; H5/H6 and all paragraph styles use
+        Manrope. These specimens render in the real PP Right Gothic — bundled with the hub.
       </Lead>
 
       <SectionHeader label="Typeface" desc="PP Right Gothic Wide — the licensed display face, bundled with the hub. Download it to install on your system." />

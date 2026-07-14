@@ -17,12 +17,13 @@ export function copyText(text, cb) {
     ta.style.opacity = "0";
     document.body.appendChild(ta);
     ta.select();
+    let ok = false;
     try {
-      document.execCommand("copy");
+      ok = document.execCommand("copy");
     } catch (e) {
       /* no-op */
     }
     document.body.removeChild(ta);
-    done();
+    if (ok) done(); // only confirm "Copied" when the copy actually happened
   }
 }

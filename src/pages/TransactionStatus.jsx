@@ -25,6 +25,7 @@ function FilterBtn({ label, active, inactiveBg, inactiveText, fluid, onClick }) 
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       style={{
         ...(fluid ? { flex: "1 0 0", minWidth: 0 } : { width: 101 }),

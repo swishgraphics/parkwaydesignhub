@@ -18,6 +18,7 @@ function LiveToggle({ state, platform, dark, onFlip }) {
       type="button"
       role="switch"
       aria-checked={on}
+      aria-label="Preview toggle"
       disabled={disabled}
       onClick={onFlip}
       style={{

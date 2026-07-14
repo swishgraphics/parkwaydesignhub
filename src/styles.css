@@ -597,6 +597,9 @@ a { color: inherit; }
 .ph-iconcell:hover { border-color: var(--pk-text-faint); background: var(--pk-hover); }
 .ph-iconcell.ok { border-color: var(--pk-success); }
 .ph-iconname { font: 400 10px var(--pk-mono); color: var(--pk-text-muted); text-align: center; word-break: break-word; }
+/* custom in-house glyphs (raw 18×18 SVGs) — scale to match the Phosphor cells */
+.ph-customglyph { display: block; }
+.ph-customglyph svg { display: block; width: 26px; height: 26px; }
 .ph-weightrow { display: inline-flex; gap: 2px; background: var(--pk-rail-bg); border: 1px solid var(--pk-line); border-radius: 8px; padding: 3px; }
 
 /* ── Marquee ─────────────────────────────────────────────────────────── */

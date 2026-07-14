@@ -9,6 +9,16 @@
       content="Parkway's design system hub — browse foundations and components, preview them live, and copy production-ready code for Vue 3, React, and Flutter."
     />
     <meta name="theme-color" content="#FFFFFF" />
+    <script>
+      // Apply the saved (or OS) theme before first paint so dark-mode users
+      // don't get a white flash; React's ThemeProvider takes over after mount.
+      try {
+        var t = localStorage.getItem("pk-theme");
+        if (t !== "light" && t !== "dark")
+          t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23F9956B'/%3E%3Ctext x='16' y='22' font-family='Arial,Helvetica,sans-serif' font-size='17' font-weight='700' text-anchor='middle' fill='%23121212'%3EP%3C/text%3E%3C/svg%3E"

@@ -95,7 +95,7 @@ function LiveDatePicker() {
               key={i}
               type="button"
               aria-label={`${MONTHS[view.month]} ${d}, ${view.year}`}
-              aria-pressed={sel}
+              aria-pressed={!!sel}
               onClick={() => setSelected(new Date(view.year, view.month, d))}
               style={{
                 height: 40, width: "100%", border: 0,
