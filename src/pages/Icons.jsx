@@ -89,6 +89,7 @@ PhosphorIcon(
 };
 
 export default function Icons({ fw, setFw, product }) {
+  const [set, setSet] = useState("phosphor");
   const [weight, setWeight] = useState("regular");
   const isRC = product?.id === "readycash";
   const USAGE = isRC ? RC_USAGE : PK_USAGE;
@@ -96,57 +97,77 @@ export default function Icons({ fw, setFw, product }) {
   return (
     <>
       <Lead>
-        {brand} uses <strong>Phosphor</strong> as its icon set — a flexible family with multiple
-        weights. Browse a curated selection, copy any import, or install Phosphor for your framework.
+        {brand} uses <strong>Phosphor</strong> as its icon set, alongside a set of{" "}
+        <strong>custom in-house icons</strong> for transaction categories. Switch between the two
+        below — Phosphor installs as a package; custom icons copy as raw SVG.
       </Lead>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, flexWrap: "wrap" }}>
-        <Tabs
-          small
-          value={weight}
-          onChange={setWeight}
-          label="Icon weight"
-          items={[["regular", "Regular"], ["bold", "Bold"], ["fill", "Fill"], ["duotone", "Duotone"]]}
-        />
-        <span style={{ font: "500 11px var(--pk-mono)", color: "var(--pk-text-faint)" }}>
-          {CURATED.length} icons · click to copy import
-        </span>
-      </div>
-
-      <SectionHeader label="Phosphor — curated set" desc="A finance-first preview — not the full library. Phosphor ships 1,500+ icons across six weights; install the package to use any of them." />
-      <div className="ph-icongrid">
-        {CURATED.map(([name, Icon]) => (
-          <Cell key={name} name={name} Icon={Icon} weight={weight} />
-        ))}
-      </div>
-      <p className="ph-note">
-        Need an icon that isn't here? Browse the full set at{" "}
-        <a href="https://phosphoricons.com" target="_blank" rel="noreferrer" style={{ color: "var(--pk-accent-ink)" }}>phosphoricons.com</a>{" "}
-        and install the package below — the hub only previews a representative subset.
-      </p>
-
-      <SectionHeader label="Install & use — Phosphor only" desc="Phosphor ships first-party packages for web (React), Vue, and Flutter. This applies to the Phosphor set above — the custom icons below need no package." />
-      <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
-      <CodeBlock code={INSTALL[fw]} label={fw === "flutter" ? "terminal" : "terminal"} />
-      <CodeBlock
-        code={USAGE[fw]}
-        label={fw === "vue" ? "IconExample.vue" : fw === "flutter" ? "icon_example.dart" : "IconExample.jsx"}
+      <Tabs
+        value={set}
+        onChange={setSet}
+        label="Icon set"
+        items={[["phosphor", "Phosphor"], ["custom", "Transaction Categories"]]}
       />
 
-      <SectionHeader
-        label="Transaction Categories — Custom"
-        desc="Parkway's own icons, designed in-house in Figma — not part of Phosphor, so there's nothing to install. Click an icon to copy its raw SVG and paste it straight into your project."
-      />
-      <div className="ph-icongrid">
-        {TX_CATEGORY_ICONS.map(({ name, label, svg }) => (
-          <CustomCell key={name} label={label} svg={svg} />
-        ))}
-      </div>
-      <p className="ph-note">
-        Monochrome by design — every path is served as <code>currentColor</code>, so the glyph
-        inherits the surrounding text colour in both light and dark mode. Tint one by setting{" "}
-        <code>color</code> on its parent.
-      </p>
+      {set === "phosphor" ? (
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
+            <Tabs
+              small
+              value={weight}
+              onChange={setWeight}
+              label="Icon weight"
+              items={[["regular", "Regular"], ["bold", "Bold"], ["fill", "Fill"], ["duotone", "Duotone"]]}
+            />
+            <span style={{ font: "500 11px var(--pk-mono)", color: "var(--pk-text-faint)" }}>
+              {CURATED.length} icons · click to copy import
+            </span>
+          </div>
+
+          <SectionHeader label="Curated set" desc="A finance-first preview — not the full library. Phosphor ships 1,500+ icons across six weights; install the package to use any of them." />
+          <div className="ph-icongrid">
+            {CURATED.map(([name, Icon]) => (
+              <Cell key={name} name={name} Icon={Icon} weight={weight} />
+            ))}
+          </div>
+          <p className="ph-note">
+            Need an icon that isn't here? Browse the full set at{" "}
+            <a href="https://phosphoricons.com" target="_blank" rel="noreferrer" style={{ color: "var(--pk-accent-ink)" }}>phosphoricons.com</a>{" "}
+            and install the package below — the hub only previews a representative subset.
+          </p>
+
+          <SectionHeader label="Install & use" desc="Phosphor ships first-party packages for web (React), Vue, and Flutter. This applies to the Phosphor set only — the custom Transaction Categories need no package." />
+          <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
+          <CodeBlock code={INSTALL[fw]} label={fw === "flutter" ? "terminal" : "terminal"} />
+          <CodeBlock
+            code={USAGE[fw]}
+            label={fw === "vue" ? "IconExample.vue" : fw === "flutter" ? "icon_example.dart" : "IconExample.jsx"}
+          />
+        </>
+      ) : (
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
+            <span style={{ font: "500 11px var(--pk-mono)", color: "var(--pk-text-faint)" }}>
+              {TX_CATEGORY_ICONS.length} icons · click to copy SVG
+            </span>
+          </div>
+
+          <SectionHeader
+            label="Transaction Categories — Custom"
+            desc="Parkway's own icons, designed in-house in Figma — not part of Phosphor, so there's nothing to install. Click an icon to copy its raw SVG and paste it straight into your project."
+          />
+          <div className="ph-icongrid">
+            {TX_CATEGORY_ICONS.map(({ name, label, svg }) => (
+              <CustomCell key={name} label={label} svg={svg} />
+            ))}
+          </div>
+          <p className="ph-note">
+            Monochrome by design — every path is served as <code>currentColor</code>, so the glyph
+            inherits the surrounding text colour in both light and dark mode. Tint one by setting{" "}
+            <code>color</code> on its parent.
+          </p>
+        </>
+      )}
     </>
   );
 }
