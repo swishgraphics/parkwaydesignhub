@@ -22,6 +22,16 @@ const GROUPS = [
     "Reference tokens (--pk-* / PkColors), never raw hex.",
     "Space on the 8-point grid; reach for the 4-point grid only for fine adjustments.",
   ]],
+  ["Light & dark mode", [
+    "Build against tokens and both modes work for free — the tokens re-map under data-theme=\"dark\".",
+    "Check both modes before shipping: every component page has a Light/Dark preview toggle in its playground.",
+    "Don't hardcode surface or text colours to make one mode look right — fix the token instead.",
+  ]],
+  ["Icons", [
+    "UI icons come from Phosphor (install the package); pick one weight per screen and stay with it.",
+    "Transaction-category icons are Parkway's own — copy the raw SVG from the Icons page; no package.",
+    "Custom icons are served as currentColor: they inherit text colour, so tint via the parent's color.",
+  ]],
 ];
 
 export default function UsageGuidelines() {

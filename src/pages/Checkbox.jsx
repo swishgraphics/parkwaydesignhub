@@ -20,6 +20,7 @@ function LiveCheck({ state, dark, onFlip }) {
       type="button"
       role="checkbox"
       aria-checked={indeterminate ? "mixed" : checked}
+      aria-label="Preview checkbox"
       disabled={disabled}
       onClick={onFlip}
       style={{

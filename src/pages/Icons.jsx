@@ -5,14 +5,25 @@ import { FRAMEWORKS } from "../tokens.js";
 import { copyText } from "../lib/copy.js";
 import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
 
-function Cell({ name, Icon, weight }) {
+// Copy string honours the global framework switch — the three Phosphor
+// packages expose different names (X / PhX / PhosphorIcons.x).
+function iconCopy(fw, name, weight) {
+  if (fw === "vue") return `import { Ph${name} } from "@phosphor-icons/vue";`;
+  if (fw === "flutter") {
+    const dartName = name.charAt(0).toLowerCase() + name.slice(1);
+    return `PhosphorIcon(PhosphorIcons.${dartName}(PhosphorIconsStyle.${weight}))`;
+  }
+  return `import { ${name} } from "@phosphor-icons/react";`;
+}
+
+function Cell({ name, Icon, weight, fw }) {
   const [ok, setOk] = useState(false);
   return (
     <button
       type="button"
       className={`ph-iconcell${ok ? " ok" : ""}`}
-      onClick={() => copyText(`import { ${name} } from "@phosphor-icons/react";`, setOk)}
-      title={`Copy import for ${name}`}
+      onClick={() => copyText(iconCopy(fw, name, weight), setOk)}
+      title={`Copy ${fw} import for ${name}`}
     >
       <Icon size={26} weight={weight} />
       <span className="ph-iconname">{ok ? "Copied" : name}</span>
@@ -127,7 +138,7 @@ export default function Icons({ fw, setFw, product }) {
           <SectionHeader label="Curated set" desc="A finance-first preview — not the full library. Phosphor ships 1,500+ icons across six weights; install the package to use any of them." />
           <div className="ph-icongrid">
             {CURATED.map(([name, Icon]) => (
-              <Cell key={name} name={name} Icon={Icon} weight={weight} />
+              <Cell key={name} name={name} Icon={Icon} weight={weight} fw={fw} />
             ))}
           </div>
           <p className="ph-note">

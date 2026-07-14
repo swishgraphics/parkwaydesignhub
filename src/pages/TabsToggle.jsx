@@ -45,6 +45,7 @@ function LiveTabsToggle({ value, onChange }) {
         <button
           key={key}
           type="button"
+          aria-pressed={value === key}
           onClick={() => onChange(key)}
           style={{
             flex: "0 0 160px",

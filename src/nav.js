@@ -89,7 +89,9 @@ export function buildItems(modules) {
   modules.forEach((m) =>
     m.items.forEach((it) => {
       if (!it.external) {
-        map[it.id] = { ...it, module: m.label };
+        // Group headers with subItems but no page of their own aren't routable —
+        // indexing them would put a dead-end row in search results.
+        if (it.page || !it.subItems) map[it.id] = { ...it, module: m.label };
         it.subItems?.forEach((sub) => {
           if (!sub.external) map[sub.id] = { ...sub, module: m.label, parentId: it.id };
         });

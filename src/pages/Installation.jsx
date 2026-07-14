@@ -2,6 +2,15 @@ import { FRAMEWORKS } from "../tokens.js";
 import { Lead, SectionHeader, Tabs, CodeBlock } from "../components/primitives.jsx";
 import { cssTokens, typoCssDesktop, flutterTokens, typoFlutter } from "../snippets/index.js";
 
+const ICONS_INSTALL = {
+  react: `# Icons — some components use Phosphor
+npm i @phosphor-icons/react`,
+  vue: `# Icons — some components use Phosphor
+npm i @phosphor-icons/vue`,
+  flutter: `# Icons — some components use Phosphor
+flutter pub add phosphor_flutter`,
+};
+
 const webFonts = `<!-- index.html -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="stylesheet"
@@ -48,7 +57,8 @@ export default function Installation({ fw, setFw }) {
   return (
     <>
       <Lead>
-        No package yet — adopt Parkway by copying the foundation files. Three steps, then drop in components.
+        Parkway is copy-first today: adopt it by copying the foundation files below, then drop in
+        components from this hub — the snippets are the reference implementations.
       </Lead>
 
       <Tabs value={fw} onChange={setFw} items={FRAMEWORKS} label="Framework" />
@@ -67,7 +77,11 @@ export default function Installation({ fw, setFw }) {
             <StepText>Use <code>pkTextTheme</code> in your <code>ThemeData</code> so every widget inherits the type ramp.</StepText>
             <CodeBlock code={typoFlutter} label="parkway_text_theme.dart" />
           </Step>
-          <Step n={4} title="Copy widgets">
+          <Step n={4} title="Add icons (as needed)">
+            <StepText>Components that show icons use <strong>Phosphor</strong> — the one real package dependency. Parkway's custom transaction-category icons need nothing: copy their SVG from the Icons page.</StepText>
+            <CodeBlock code={ICONS_INSTALL.flutter} label="terminal" />
+          </Step>
+          <Step n={5} title="Copy widgets">
             <StepText>Grab any widget from the Components section — each references these tokens, never raw hex.</StepText>
           </Step>
         </>
@@ -85,11 +99,25 @@ export default function Installation({ fw, setFw }) {
             <StepText>Add <code>parkway-type.css</code> for the H1–P12 ramp.</StepText>
             <CodeBlock code={typoCssDesktop} label="parkway-type.css" />
           </Step>
-          <Step n={4} title="Copy components">
+          <Step n={4} title="Add icons (as needed)">
+            <StepText>Components that show icons use <strong>Phosphor</strong> — the one real package dependency. Parkway's custom transaction-category icons need nothing: copy their SVG from the Icons page.</StepText>
+            <CodeBlock code={ICONS_INSTALL[fw]} label="terminal" />
+          </Step>
+          <Step n={5} title="Copy components">
             <StepText>Grab any component from the Components section — each references these tokens, never raw hex.</StepText>
           </Step>
         </>
       )}
+
+      <SectionHeader label="Packages & SDK — status" desc="What you can and can't install today." />
+      <p className="ph-note" style={{ marginTop: 10 }}>
+        There is <strong>no installable Parkway package or SDK yet</strong> — nothing to{" "}
+        <code>npm install</code> beyond the icon set above. Component packages
+        (<code>@parkway/react</code>, <code>@parkway/vue</code>, <code>parkway_flutter</code>) are on
+        the roadmap; until they ship, the copy-first steps above are the supported path and this
+        hub's snippets are the source of truth. When the packages land, this page will carry the
+        real install commands.
+      </p>
     </>
   );
 }

@@ -18,6 +18,7 @@ function LiveRadio({ state, dark, onFlip }) {
       type="button"
       role="radio"
       aria-checked={checked}
+      aria-label="Preview radio"
       disabled={disabled}
       onClick={onFlip}
       style={{

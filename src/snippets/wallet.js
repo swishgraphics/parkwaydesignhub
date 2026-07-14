@@ -113,10 +113,16 @@ export function usageTextInput(fw, extra, state) {
   label: 'Amount',
   hint: 'Placeholder text',${extra === "helper" ? "\n  helper: 'Your remaining daily transfer limit is N200,000.00'," : ""}${err ? "\n  error: 'Enter a valid amount'," : ""}${dis ? "\n  enabled: false," : ""}${extra === "icon" ? "\n  suffixIcon: const Icon(Icons.expand_more)," : ""}
 )`;
-  const tag = fw === "vue" ? "PkTextInput" : "PkTextInput";
-  return `<${tag}
+  const tag = "PkTextInput";
+  const open = `<${tag}
   label="Amount"
-  placeholder="Placeholder text"${extra === "helper" ? `\n  helper="Your remaining daily transfer limit is N200,000.00"` : ""}${err ? `\n  error="Enter a valid amount"` : ""}${dis ? `\n  ${fw === "vue" ? "disabled" : "disabled"}` : ""}${extra === "icon" ? `\n  ${fw === "vue" ? `>\n  <template #icon><CaretDown /></template>\n</${tag}` : `trailingIcon={<CaretDown />}`}` : ""} />`;
+  placeholder="Placeholder text"${extra === "helper" ? `\n  helper="Your remaining daily transfer limit is N200,000.00"` : ""}${err ? `\n  error="Enter a valid amount"` : ""}${dis ? "\n  disabled" : ""}`;
+  if (extra === "icon") {
+    // Vue passes the icon via a slot, so the element can't self-close.
+    if (fw === "vue") return `${open}\n>\n  <template #icon><CaretDown /></template>\n</${tag}>`;
+    return `${open}\n  trailingIcon={<CaretDown />}\n/>`;
+  }
+  return `${open}\n/>`;
 }
 
 /* ── Toast Message ──────────────────────────────────────────────────── */
@@ -465,7 +471,10 @@ const model = defineModel({ type: Boolean });
 .pk-check input { position: absolute; opacity: 0; }
 .pk-check__box { width: 20px; height: 20px; border-radius: 6px;
   border: 1.5px solid var(--pk-border); background: var(--pk-field-bg); transition: all .15s ease; }
-.pk-check input:checked + .pk-check__box { background: var(--pk-tangerine-01); border-color: var(--pk-tangerine-01); }
+.pk-check input:checked + .pk-check__box { background: var(--pk-tangerine-01);
+  border-color: var(--pk-tangerine-01);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 8.5l3 3 6-6' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: contain; }
 </style>`;
 
 export const flutterCheckbox = `// pk_checkbox.dart — Parkway Wallet
@@ -556,11 +565,11 @@ export default function PkMarquee({ items = [], speed = 40, paused = false }) {
 export const vueMarquee = `<!-- PkMarquee.vue — Parkway Wallet -->
 <script setup>
 import { computed } from 'vue';
-const props = withDefaults(defineProps({
+const props = defineProps({
   items: { type: Array, default: () => [] },
   speed: { type: Number, default: 40 },
   paused: { type: Boolean, default: false },
-}), {});
+});
 const track = computed(() => [...props.items, ...props.items]);
 </script>
 
@@ -656,20 +665,26 @@ class _PkMarqueeState extends State<PkMarquee>
     final track = [...widget.items, ...widget.items];
     return Container(
       height: 40,
-      color: PkColors.tangerine01,
+      decoration: const BoxDecoration(color: PkColors.tangerine01),
       clipBehavior: Clip.hardEdge,
-      decoration: const BoxDecoration(),
-      child: AnimatedBuilder(
-        animation: _ctrl,
-        builder: (context, child) => FractionalTranslation(
-          translation: Offset(-_ctrl.value, 0),
-          child: child,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: track
-              .map((text) => _PkMarqueeItem(text: text))
-              .toList(),
+      // OverflowBox lifts the width constraint so the duplicated track lays
+      // out at its intrinsic width; translating by 0 → -0.5 of that width is
+      // one seamless loop (the CSS translateX(-50%) equivalent).
+      child: OverflowBox(
+        maxWidth: double.infinity,
+        alignment: Alignment.centerLeft,
+        child: AnimatedBuilder(
+          animation: _ctrl,
+          builder: (context, child) => FractionalTranslation(
+            translation: Offset(-_ctrl.value, 0),
+            child: child,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: track
+                .map((text) => _PkMarqueeItem(text: text))
+                .toList(),
+          ),
         ),
       ),
     );
@@ -751,7 +766,7 @@ export function usageMarquee(fw, speed) {
   if (fw === "flutter")
     return `PkMarquee(\n  items: const [\n    'Link all your accounts in one place.',\n    'Bank Account feature is LIVE!',\n    'New NDD Feature Out Soon',\n  ],\n  speed: ${speed},\n)`;
   if (fw === "vue")
-    return `<PkMarquee\n  :items="${items.replace(/"/g, "'").replace(/\n/g, "\\n")}"\n  :speed="${speed}"\n/>`;
+    return `<PkMarquee\n  :items="${items}"\n  :speed="${speed}"\n/>`;
   return `<PkMarquee\n  items={${items}}\n  speed={${speed}}\n/>`;
 }
 
@@ -803,7 +818,7 @@ export function PkTransactionStatus({ value = 'successful', onChange }) {
 
 /* parkway-transaction-filters.css
 
-/* ── Tokens (swap for dark mode) ── */
+── Tokens (swap for dark mode) ──
 :root {
   --pk-filter-type-bg:    #F0F0F0;
   --pk-filter-type-text:  #121212;
@@ -894,7 +909,8 @@ const TX_STATUSES = [
   </div>
 </template>
 
-<style scoped>
+<!-- Tokens are global on purpose — :root inside <style scoped> would never match. -->
+<style>
 :root {
   --pk-filter-type-bg: #F0F0F0; --pk-filter-type-text: #121212;
   --pk-filter-stat-bg: #FBFBFB; --pk-filter-stat-text: #C6C6C6;
@@ -903,6 +919,9 @@ const TX_STATUSES = [
   --pk-filter-type-bg: #242424; --pk-filter-type-text: #FFFFFF;
   --pk-filter-stat-bg: #1F1F1F; --pk-filter-stat-text: #FFFFFF;
 }
+</style>
+
+<style scoped>
 .pk-filters { display: flex; flex-direction: column; gap: 24px; width: 100%; }
 .pk-filter-group { display: flex; flex-direction: column; gap: 15px; }
 .pk-filter-group__label { font: 400 12px/1 Manrope, sans-serif; color: #999; }
@@ -1097,7 +1116,8 @@ const idx = computed(() => props.tabs.findIndex(([k]) => k === props.modelValue)
   </div>
 </template>
 
-<style scoped>
+<!-- Tokens are global on purpose — :root inside <style scoped> would never match. -->
+<style>
 :root {
   --pk-tabs-toggle-bg:          #F9F9F9;
   --pk-tabs-toggle-pill-bg:     #FFFFFF;
@@ -1110,6 +1130,9 @@ const idx = computed(() => props.tabs.findIndex(([k]) => k === props.modelValue)
   --pk-tabs-toggle-pill-border: #F9956B;
   --pk-tabs-toggle-text:        #FFFFFF;
 }
+</style>
+
+<style scoped>
 .pk-tabs-toggle {
   position: relative; display: flex;
   width: 343px; height: 48px;
@@ -1174,7 +1197,9 @@ class PkTabsToggle extends StatelessWidget {
             ),
           ),
         ),
-        Row(children: tabs.map(((String, String) t) => GestureDetector(
+        // spaceBetween yields the 15px gap the pill's idx * 175 offset expects
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: tabs.map(((String, String) t) => GestureDetector(
           onTap: () => onChanged(t.\$1),
           child: SizedBox(
             width: 160,
@@ -1762,8 +1787,8 @@ class _PkRadioTile<T> extends StatelessWidget {
 export function usageRadio(fw, checked) {
   const c = checked ? "true" : "false";
   if (fw === "flutter")
-    return `PkRadio(\n  checked: ${c},\n  onChanged: (v) => setState(() => isSelected = v),\n  child: const Text('Physical Card'),\n)`;
+    return `PkRadioGroup<String>(\n  options: const [\n    PkRadioOption(value: 'physical', label: 'Physical Card'),\n    PkRadioOption(value: 'virtual', label: 'Virtual Card'),\n  ],\n  value: ${checked ? "'physical'" : "cardType"},\n  onChanged: (v) => setState(() => cardType = v),\n)`;
   if (fw === "vue")
-    return `<PkRadio :checked="${c}" @change="isSelected = $event">\n  Physical Card\n</PkRadio>`;
+    return `<!-- cardType: ref(${checked ? "'physical'" : "''"}) -->\n<PkRadio\n  v-model="cardType"\n  name="card-type"\n  :options="[\n    { key: 'physical', label: 'Physical Card' },\n    { key: 'virtual', label: 'Virtual Card' },\n  ]"\n/>`;
   return `<PkRadio checked={${c}} onChange={setIsSelected}>\n  Physical Card\n</PkRadio>`;
 }

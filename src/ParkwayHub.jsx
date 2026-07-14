@@ -127,7 +127,18 @@ export default function ParkwayHub() {
 
   return (
     <div className="ph-app">
-      <a className="ph-skip" href="#ph-main">Skip to content</a>
+      <a
+        className="ph-skip"
+        href="#ph-main"
+        onClick={(e) => {
+          // Plain fragment navigation would be parsed as a route by the hash
+          // router and bounce the user to Introduction — focus main instead.
+          e.preventDefault();
+          document.getElementById("ph-main")?.focus();
+        }}
+      >
+        Skip to content
+      </a>
       <Rail product={product} activeModule={moduleOf(product.modules, page)} />
       <div className="ph-body">
         <div className="ph-main">

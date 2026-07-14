@@ -37,7 +37,7 @@ export default function PkButton({
   gap: 6px; font: 600 14px/1 Manrope, sans-serif;
   color: var(--pk-grey-01); transition: background .15s ease;
 }
-.pk-btn--mobile { border-radius: 8px; }   /* mobile platform */
+.pk-btn--mobile { border-radius: 8px; }   — mobile platform
 .pk-btn--primary            { background: var(--pk-tangerine-01); }
 .pk-btn--primary:hover      { background: var(--pk-tangerine-03); }
 .pk-btn--primary:disabled   { background: var(--pk-tangerine-04);
